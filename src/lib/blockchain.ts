@@ -77,7 +77,7 @@ export const blockchain = {
     const data = db.get();
     const payroll = data.payrolls.find((p) => p.id === payrollId);
     if (!payroll || payroll.status !== "approved") return false;
-    if (!payroll.proof || !proofEngine.verify(payroll.proof, payrollId)) return false;
+    if (!payroll.proof || !proofEngine.verify(payroll.proof)) return false;
 
     const updated = data.payrolls.map((p) =>
       p.id === payrollId ? { ...p, status: "claimed" as const } : p
