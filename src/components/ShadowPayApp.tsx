@@ -1,7 +1,9 @@
 import { useState } from "react";
+import { motion, AnimatePresence } from "framer-motion";
 import { useMiden } from "@miden-sdk/react";
 import { useMidenFiWallet } from "@miden-sdk/miden-wallet-adapter-react";
 import { WalletReadyState } from "@miden-sdk/miden-wallet-adapter-base";
+
 import { Dashboard } from "./Dashboard";
 import { Employees } from "./Employees";
 import { Payroll } from "./Payroll";
@@ -10,31 +12,52 @@ import { Treasury } from "./Treasury";
 
 type Page = "dashboard" | "employees" | "payroll" | "claim" | "treasury";
 
-function WalletButton() {
-  const { wallet, connected, connecting, connect, disconnect } = useMidenFiWallet();
-  const readyState = wallet?.readyState;
-  const walletReady =
-    readyState === WalletReadyState.Installed ||
-    readyState === WalletReadyState.Loadable;
+const navLinks = [
+  { id: "dashboard", label: "Home", icon: "⬡" },
+  { id: "treasury", label: "Vault", icon: "◈" },
+  { id: "employees", label: "Team", icon: "◎" },
+  { id: "payroll", label: "Payroll", icon: "◆" },
+  { id: "claim", label: "Claim", icon: "◉" },
+] as const;
 
-  if (!walletReady) return (
-    <button className="bg-zinc-700 text-zinc-400 px-4 py-2 rounded-lg text-sm" disabled>
-      Install Miden Wallet
-    </button>
-  );
-  if (connected) return (
-    <button onClick={disconnect} className="bg-red-900 text-red-300 px-4 py-2 rounded-lg text-sm hover:bg-red-800">
-      Disconnect
-    </button>
-  );
-  if (connecting) return (
-    <button disabled className="bg-zinc-700 text-zinc-400 px-4 py-2 rounded-lg text-sm">
-      Connecting...
-    </button>
-  );
+function WalletButton() {
+  const { wallet, connected, connecting, connect, disconnect } =
+    useMidenFiWallet();
+
+  const ready =
+    wallet?.readyState === WalletReadyState.Installed ||
+    wallet?.readyState === WalletReadyState.Loadable;
+
+  if (!ready)
+    return (
+      <button className="w-full rounded-xl bg-zinc-900 px-3 py-2 text-xs text-zinc-500">
+        Install Wallet
+      </button>
+    );
+
+  if (connecting)
+    return (
+      <button className="w-full rounded-xl bg-zinc-900 px-3 py-2 text-xs text-zinc-400 animate-pulse">
+        Connecting...
+      </button>
+    );
+
+  if (connected)
+    return (
+      <button
+        onClick={disconnect}
+        className="w-full rounded-xl bg-red-950/40 border border-red-900/40 px-3 py-2 text-xs text-red-300"
+      >
+        Disconnect
+      </button>
+    );
+
   return (
-    <button onClick={connect} className="bg-white text-black px-4 py-2 rounded-lg text-sm font-medium hover:bg-zinc-200">
-      Connect Miden Wallet
+    <button
+      onClick={connect}
+      className="w-full rounded-xl bg-violet-600 px-3 py-2 text-xs font-medium text-white"
+    >
+      Connect Wallet
     </button>
   );
 }
@@ -42,105 +65,155 @@ function WalletButton() {
 export function ShadowPayApp() {
   const [page, setPage] = useState<Page>("dashboard");
   const [menuOpen, setMenuOpen] = useState(false);
+
   const { isReady, isInitializing, error } = useMiden();
-  const { connected, address } = useMidenFiWallet();
+  const { address } = useMidenFiWallet();
 
-  const navLinks: { id: Page; label: string }[] = [
-    { id: "dashboard", label: "Dashboard" },
-    { id: "treasury", label: "Treasury" },
-    { id: "employees", label: "Employees" },
-    { id: "payroll", label: "Payroll" },
-    { id: "claim", label: "Claim" },
-  ];
-
-  if (error) return (
-    <div className="min-h-screen bg-zinc-950 text-white flex items-center justify-center">
-      <div className="text-center">
-        <p className="text-red-400 text-lg">Failed to initialize Miden client</p>
-        <p className="text-zinc-500 text-sm mt-2">{error.message}</p>
+  if (error) {
+    return (
+      <div className="flex min-h-screen items-center justify-center bg-black text-white">
+        <div className="text-center">
+          <p className="text-red-400">System Error</p>
+          <p className="text-zinc-500 text-sm">{error.message}</p>
+        </div>
       </div>
-    </div>
-  );
+    );
+  }
 
-  if (isInitializing || !isReady) return (
-    <div className="min-h-screen bg-zinc-950 text-white flex items-center justify-center">
-      <div className="text-center">
-        <div className="w-8 h-8 border-2 border-white border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
-        <p className="text-zinc-400">Initializing Miden client...</p>
+  if (isInitializing || !isReady) {
+    return (
+      <div className="flex min-h-screen items-center justify-center bg-black">
+        <div className="h-6 w-6 animate-spin rounded-full border-2 border-violet-500 border-t-transparent"></div>
       </div>
-    </div>
-  );
+    );
+  }
 
   return (
-    <div className="min-h-screen bg-zinc-950 text-white flex">
+    <div className="flex min-h-screen w-full bg-black text-white overflow-hidden">
 
-      {/* DESKTOP SIDEBAR */}
-      <aside className="hidden md:flex w-60 bg-zinc-900 border-r border-zinc-800 flex-col p-6 fixed h-full">
-        <h1 className="text-xl font-bold mb-1">ShadowPay</h1>
-        <p className="text-xs text-zinc-500 mb-6">on Miden Testnet</p>
+      {/* BACKDROP */}
+      <AnimatePresence>
+        {menuOpen && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            onClick={() => setMenuOpen(false)}
+            className="fixed inset-0 z-40 bg-black/70 md:hidden"
+          />
+        )}
+      </AnimatePresence>
 
-        <nav className="space-y-1 flex-1">
-          {navLinks.map((link) => (
+      {/* DESKTOP SIDEBAR (FIXED WIDTH) */}
+      <aside className="hidden md:flex w-64 flex-col border-r border-zinc-900 bg-zinc-950">
+        <div className="p-5 border-b border-zinc-900">
+          <h1 className="font-bold text-lg">ShadowPay</h1>
+          <p className="text-[10px] text-zinc-500">Finance OS</p>
+        </div>
+
+        <nav className="flex-1 p-3 space-y-1">
+          {navLinks.map((l) => (
             <button
-              key={link.id}
-              onClick={() => setPage(link.id)}
-              className={`w-full text-left px-3 py-2 rounded-lg text-sm transition ${
-                page === link.id
-                  ? "bg-white text-black font-medium"
-                  : "text-zinc-400 hover:bg-zinc-800 hover:text-white"
+              key={l.id}
+              onClick={() => setPage(l.id)}
+              className={`w-full flex items-center gap-3 rounded-xl px-3 py-2 text-sm transition ${
+                page === l.id
+                  ? "bg-violet-500/10 text-violet-300"
+                  : "text-zinc-500 hover:bg-zinc-900"
               }`}
             >
-              {link.label}
+              <span>{l.icon}</span>
+              {l.label}
             </button>
           ))}
         </nav>
 
-        <div className="mt-4 space-y-2">
-          {connected && address && (
-            <p className="text-xs text-zinc-500 truncate">
-              🟢 {address.slice(0, 20)}...
+        <div className="p-3 border-t border-zinc-900 space-y-2">
+          <WalletButton />
+          {address && (
+            <p className="text-[10px] text-zinc-600 truncate">
+              {address}
             </p>
           )}
-          <WalletButton />
         </div>
       </aside>
 
       {/* MOBILE TOPBAR */}
-      <div className="md:hidden fixed top-0 left-0 right-0 z-50 bg-zinc-900 border-b border-zinc-800 px-4 py-3 flex justify-between items-center">
-        <h1 className="text-lg font-bold">ShadowPay</h1>
-        <div className="flex items-center gap-2">
-          <WalletButton />
-          <button onClick={() => setMenuOpen(!menuOpen)} className="text-zinc-300 text-xl ml-2">
-            {menuOpen ? "✕" : "☰"}
-          </button>
-        </div>
+      <div className="fixed top-0 left-0 right-0 z-30 md:hidden flex justify-between items-center px-4 py-3 bg-black border-b border-zinc-900">
+        <div className="font-bold text-sm">ShadowPay</div>
+        <button
+          onClick={() => setMenuOpen(!menuOpen)}
+          className="px-3 py-1 rounded bg-zinc-900 text-xs"
+        >
+          ☰
+        </button>
       </div>
 
       {/* MOBILE MENU */}
-      {menuOpen && (
-        <div className="md:hidden fixed top-14 left-0 right-0 z-40 bg-zinc-900 border-b border-zinc-800 px-4 py-3 space-y-1">
-          {navLinks.map((link) => (
+      <AnimatePresence>
+        {menuOpen && (
+          <motion.div
+            initial={{ x: -300 }}
+            animate={{ x: 0 }}
+            exit={{ x: -300 }}
+            className="fixed left-0 top-0 z-50 h-full w-72 bg-zinc-950 p-4 md:hidden"
+          >
+            {navLinks.map((l) => (
+              <button
+                key={l.id}
+                onClick={() => {
+                  setPage(l.id);
+                  setMenuOpen(false);
+                }}
+                className="w-full flex items-center gap-3 rounded-xl px-3 py-2 text-sm text-zinc-400 hover:bg-zinc-900"
+              >
+                <span>{l.icon}</span>
+                {l.label}
+              </button>
+            ))}
+
+            <div className="mt-4">
+              <WalletButton />
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* MAIN CONTENT (🔥 FIXED FULL WIDTH SYSTEM) */}
+      <main className="flex-1 w-full min-w-0 md:w-[calc(100%-16rem)] pt-14 md:pt-6 pb-24 overflow-y-auto px-4 md:px-8">
+        <AnimatePresence mode="wait">
+          <motion.div
+            key={page}
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -10 }}
+          >
+            {page === "dashboard" && <Dashboard />}
+            {page === "treasury" && <Treasury />}
+            {page === "employees" && <Employees />}
+            {page === "payroll" && <Payroll />}
+            {page === "claim" && <Claim />}
+          </motion.div>
+        </AnimatePresence>
+      </main>
+
+      {/* MOBILE BOTTOM NAV */}
+      <div className="fixed bottom-0 left-0 right-0 z-30 md:hidden border-t border-zinc-900 bg-black pb-[env(safe-area-inset-bottom)]">
+        <div className="grid grid-cols-5 text-[10px]">
+          {navLinks.map((l) => (
             <button
-              key={link.id}
-              onClick={() => { setPage(link.id); setMenuOpen(false); }}
-              className={`w-full text-left px-3 py-2 rounded-lg text-sm ${
-                page === link.id ? "bg-white text-black font-medium" : "text-zinc-400"
+              key={l.id}
+              onClick={() => setPage(l.id)}
+              className={`py-2 flex flex-col items-center ${
+                page === l.id ? "text-violet-400" : "text-zinc-500"
               }`}
             >
-              {link.label}
+              <span className="text-base">{l.icon}</span>
+              {l.label}
             </button>
           ))}
         </div>
-      )}
-
-      {/* MAIN */}
-      <main className="flex-1 md:ml-60 pt-16 md:pt-0 min-h-screen">
-        {page === "dashboard" && <Dashboard />}
-        {page === "treasury" && <Treasury />}
-        {page === "employees" && <Employees />}
-        {page === "payroll" && <Payroll />}
-        {page === "claim" && <Claim />}
-      </main>
+      </div>
     </div>
   );
 }

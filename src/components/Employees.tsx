@@ -13,41 +13,138 @@ export function Employees() {
     return eventBus.subscribe(() => setData(blockchain.getState()));
   }, []);
 
-  if (!data) return <div className="p-6 text-zinc-400">Loading...</div>;
+  if (!data) {
+    return (
+      <div className="flex h-64 items-center justify-center">
+        <div className="h-6 w-6 animate-spin rounded-full border-2 border-violet-500 border-t-transparent"></div>
+      </div>
+    );
+  }
 
   const handleAdd = () => {
     const s = Number(salary);
-    if (!name.trim() || !s || s <= 0) return alert("Name and valid salary required");
+
+    if (!name.trim() || !s || s <= 0) {
+      alert("Name and valid salary required");
+      return;
+    }
+
     blockchain.addEmployee(name.trim(), s);
-    setName(""); setSalary("");
+
+    setName("");
+    setSalary("");
   };
 
   return (
-    <div className="p-6 md:p-10 space-y-6">
+    <div className="mx-auto w-full max-w-6xl p-4 sm:p-6 lg:p-8 space-y-5">
+      {/* HEADER */}
       <div>
-        <h1 className="text-2xl font-bold">Employees</h1>
-        <p className="text-zinc-500 text-sm mt-1">Manage team members</p>
+        <h1 className="text-2xl font-bold text-white">
+          Employees
+        </h1>
+
+        <p className="mt-1 text-sm text-zinc-500">
+          Manage your team members
+        </p>
       </div>
 
-      <div className="bg-zinc-900 p-5 rounded-xl border border-zinc-800 space-y-3">
-        <h3 className="font-semibold text-sm">Add Employee</h3>
-        <input className="w-full p-2 bg-zinc-800 rounded border border-zinc-700 text-white text-sm" placeholder="Full name" value={name} onChange={(e) => setName(e.target.value)} />
-        <input className="w-full p-2 bg-zinc-800 rounded border border-zinc-700 text-white text-sm" placeholder="Monthly salary" type="number" value={salary} onChange={(e) => setSalary(e.target.value)} />
-        <button onClick={handleAdd} className="bg-white text-black px-5 py-2 rounded text-sm font-medium hover:bg-zinc-200">Add Employee</button>
+      {/* ADD EMPLOYEE */}
+      <div className="rounded-xl border border-zinc-800/50 bg-zinc-900/50 p-5">
+        <h3 className="mb-4 text-sm font-semibold text-white">
+          Add New Employee
+        </h3>
+
+        <div className="grid grid-cols-1 gap-3 md:grid-cols-3">
+          <input
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+            onKeyDown={(e) =>
+              e.key === "Enter" && handleAdd()
+            }
+            placeholder="Employee Name"
+            className="rounded-lg border border-zinc-700/50 bg-zinc-800/50 px-3 py-3 text-sm text-white placeholder-zinc-600 outline-none transition focus:border-violet-500"
+          />
+
+          <input
+            type="number"
+            value={salary}
+            onChange={(e) => setSalary(e.target.value)}
+            onKeyDown={(e) =>
+              e.key === "Enter" && handleAdd()
+            }
+            placeholder="Monthly Salary"
+            className="rounded-lg border border-zinc-700/50 bg-zinc-800/50 px-3 py-3 text-sm text-white placeholder-zinc-600 outline-none transition focus:border-violet-500"
+          />
+
+          <button
+            onClick={handleAdd}
+            className="rounded-lg bg-violet-600 px-4 py-3 text-sm font-medium text-white transition hover:bg-violet-500"
+          >
+            Add Employee
+          </button>
+        </div>
       </div>
 
+      {/* EMPLOYEE COUNT */}
+      <div className="rounded-xl border border-zinc-800/50 bg-zinc-900/50 p-4">
+        <p className="text-sm text-zinc-500">
+          Total Employees
+        </p>
+
+        <p className="mt-1 text-3xl font-bold text-white">
+          {data.employees.length}
+        </p>
+      </div>
+
+      {/* EMPLOYEE LIST */}
       <div className="space-y-3">
         {data.employees.length === 0 ? (
-          <p className="text-zinc-500 text-sm">No employees yet</p>
-        ) : data.employees.map((emp) => (
-          <div key={emp.id} className="bg-zinc-900 p-4 rounded-xl border border-zinc-800 flex justify-between items-center">
-            <div>
-              <p className="font-semibold text-sm">{emp.name}</p>
-              <p className="text-zinc-400 text-xs">{emp.salary.toLocaleString()} / month</p>
-            </div>
-            <button onClick={() => blockchain.deleteEmployee(emp.id)} className="text-red-400 text-xs hover:text-red-300">Remove</button>
+          <div className="rounded-xl border border-zinc-800/30 bg-zinc-900/30 p-10 text-center">
+            <p className="text-sm text-zinc-500">
+              No employees found
+            </p>
+
+            <p className="mt-1 text-xs text-zinc-700">
+              Add your first employee above
+            </p>
           </div>
-        ))}
+        ) : (
+          data.employees.map((emp) => (
+            <div
+              key={emp.id}
+              className="rounded-xl border border-zinc-800/50 bg-zinc-900/50 p-4"
+            >
+              <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+                <div className="flex items-center gap-3">
+                  <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-violet-600/30 bg-violet-600/20">
+                    <span className="text-sm font-bold text-violet-400">
+                      {emp.name.charAt(0).toUpperCase()}
+                    </span>
+                  </div>
+
+                  <div className="min-w-0">
+                    <p className="truncate font-medium text-white">
+                      {emp.name}
+                    </p>
+
+                    <p className="text-sm text-zinc-500">
+                      {emp.salary.toLocaleString()} / month
+                    </p>
+                  </div>
+                </div>
+
+                <button
+                  onClick={() =>
+                    blockchain.deleteEmployee(emp.id)
+                  }
+                  className="w-full rounded-lg bg-red-950/40 px-4 py-2 text-sm text-red-400 transition hover:bg-red-900/40 sm:w-auto"
+                >
+                  Remove
+                </button>
+              </div>
+            </div>
+          ))
+        )}
       </div>
     </div>
   );
