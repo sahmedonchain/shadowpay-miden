@@ -1,0 +1,24 @@
+{
+  "permissions": {
+    "allow": [
+      "WebFetch(domain:github.com)",
+      "WebFetch(domain:api.github.com)",
+      "mcp__playwright__browser_navigate",
+      "mcp__playwright__browser_console_messages",
+      "mcp__playwright__browser_take_screenshot",
+      "WebFetch(domain:registry.npmjs.org)",
+      "mcp__playwright__browser_wait_for",
+      "mcp__playwright__browser_snapshot",
+      "mcp__playwright__browser_evaluate",
+      "WebFetch(domain:rpc.testnet.miden.io)",
+      "WebFetch(domain:testnet.midenscan.com)",
+      "WebFetch(domain:transport.miden.io)",
+      "mcp__playwright__browser_close",
+      "WebFetch(domain:scan-backend-testnet-miden.eu-central-8.gateway.fm)",
+      "WebFetch(domain:transport.devnet.miden.io)",
+      "WebFetch(domain:tx-prover.testnet.miden.io)",
+      "WebFetch(domain:registry.yarnpkg.com)",
+      "mcp__playwright__browser_network_requests"
+    ]
+  }
+}
