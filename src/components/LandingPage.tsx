@@ -134,7 +134,7 @@ export function LandingPage({ onEnter }: { onEnter: (role: Role) => void }) {
               <span className="ml-2 text-xs text-zinc-600 font-mono">shadowpay-payroll — Block #491,827</span>
               <div className="ml-auto w-2 h-2 rounded-full bg-green-400 animate-pulse"></div>
             </div>
-            <div className="p-5 font-mono text-xs space-y-0">
+            <div className="p-4 font-mono text-[10px] sm:text-xs space-y-0 overflow-hidden">
               {[
                 { label: "Initiating payroll batch", value: "processing...", orange: true },
                 { label: "Recipients", value: "██ shielded wallets" },
@@ -156,7 +156,7 @@ export function LandingPage({ onEnter }: { onEnter: (role: Role) => void }) {
         </div>
 
         {/* STATS BAR */}
-        <div className="relative z-10 mt-6 w-full max-w-3xl mx-auto grid grid-cols-2 md:grid-cols-4 gap-2 text-center">
+        <div className="relative z-10 mt-6 w-full max-w-3xl mx-auto grid grid-cols-2 md:grid-cols-4 gap-2 text-center px-2">
           {[
             { label: "POWERED BY MIDEN", value: "ZK Rollup" },
             { label: "ZERO-KNOWLEDGE", value: "Client-side Proving" },
@@ -269,7 +269,7 @@ export function LandingPage({ onEnter }: { onEnter: (role: Role) => void }) {
       <section className="py-16 md:py-24 px-6 border-t border-zinc-900">
         <div className="max-w-3xl mx-auto space-y-10">
           <div className="text-center space-y-2">
-            <h2 className="text-xl md:text-4xl font-bold">Questions we get asked. Answers you can trust.</h2>
+            <h2 className="text-lg md:text-4xl font-bold">Questions we get asked. Answers you can trust.</h2>
           </div>
           <div className="space-y-8">
             {faqs.map((section) => (
@@ -348,22 +348,23 @@ export function LandingPage({ onEnter }: { onEnter: (role: Role) => void }) {
 
       {/* FOOTER */}
       <footer className="border-t border-zinc-900 py-8 px-6">
-        <div className="max-w-6xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4">
-          <div className="flex items-center gap-2">
-            <div className="w-5 h-5 rounded-md bg-gradient-to-br from-orange-500 to-red-600 flex items-center justify-center">
-              <span className="text-white text-[10px] font-bold">S</span>
-            </div>
-            <span className="text-sm text-zinc-500">ShadowPay</span>
-            <span className="text-zinc-700 text-xs">· © 2025 ShadowPay. All rights reserved.</span>
-          </div>
-          <div className="flex items-center gap-5 text-xs text-zinc-600">
-            <a href="#features" className="hover:text-zinc-400 transition">Features</a>
-            <a href="#how-it-works" className="hover:text-zinc-400 transition">Team</a>
-            <a href="https://github.com/sahmedonchain/shadowpay-miden" target="_blank" rel="noreferrer" className="hover:text-zinc-400 transition">GitHub</a>
-            <a href="https://miden.xyz" target="_blank" rel="noreferrer" className="hover:text-zinc-400 transition">Built on Miden</a>
-          </div>
-        </div>
-      </footer>
+  <div className="max-w-6xl mx-auto flex flex-col items-center gap-4 sm:flex-row sm:justify-between">
+    <div className="flex items-center gap-2">
+      <div className="w-5 h-5 rounded-md bg-gradient-to-br from-orange-500 to-red-600 flex items-center justify-center">
+        <span className="text-white text-[10px] font-bold">S</span>
+      </div>
+      <span className="text-sm text-zinc-500">ShadowPay</span>
+      <span className="text-zinc-700 text-xs hidden sm:inline">· © 2025 All rights reserved.</span>
+    </div>
+    <div className="flex flex-wrap items-center justify-center gap-4 text-xs text-zinc-600">
+      <a href="#features" className="hover:text-zinc-400 transition">Features</a>
+      <a href="#how-it-works" className="hover:text-zinc-400 transition">How it Works</a>
+      <a href="https://github.com/sahmedonchain/shadowpay-miden" target="_blank" rel="noreferrer" className="hover:text-zinc-400 transition">GitHub</a>
+      <a href="https://miden.xyz" target="_blank" rel="noreferrer" className="hover:text-zinc-400 transition">Built on Miden</a>
+    </div>
+    <p className="text-zinc-700 text-xs sm:hidden">© 2025 ShadowPay. All rights reserved.</p>
+  </div>
+</footer>
 
     </div>
   );
