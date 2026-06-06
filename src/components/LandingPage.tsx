@@ -101,7 +101,7 @@ export function LandingPage({ onEnter }: { onEnter: (role: Role) => void }) {
             <span className="w-1.5 h-1.5 rounded-full bg-orange-400 animate-pulse"></span>
             LIVE ON MIDEN TESTNET — SDK V0.14
           </div>
-          <h1 className="text-5xl md:text-7xl font-bold leading-[1.05] tracking-tight">
+          <h1 className="text-3xl sm:text-5xl md:text-7xl font-bold leading-[1.05] tracking-tight">
             Private Payroll,<br />Built on{" "}
             <span className="bg-gradient-to-r from-orange-400 to-red-500 bg-clip-text text-transparent">Miden</span>
           </h1>
@@ -116,7 +116,7 @@ export function LandingPage({ onEnter }: { onEnter: (role: Role) => void }) {
               See How It Works
             </button>
           </div>
-          <div className="flex flex-wrap items-center justify-center gap-5 pt-4 text-xs text-zinc-600">
+          <div className="flex flex-wrap items-center justify-center gap-3 pt-3 text-xs text-zinc-600">
             <span className="flex items-center gap-1.5"><span className="text-orange-400">✓</span> No on-chain salary exposure</span>
             <span className="flex items-center gap-1.5"><span className="text-orange-400">✓</span> Treasury balance stays private</span>
             <span className="flex items-center gap-1.5"><span className="text-orange-400">✓</span> ZK proofs on every payment</span>
@@ -125,7 +125,7 @@ export function LandingPage({ onEnter }: { onEnter: (role: Role) => void }) {
         </div>
 
         {/* MOCK TERMINAL */}
-        <div className="relative z-10 mt-12 w-full max-w-2xl mx-auto">
+        <div className="relative z-10 mt-8 w-full max-w-2xl mx-auto px-2">
           <div className="bg-zinc-900/90 border border-zinc-700/50 rounded-2xl overflow-hidden shadow-2xl shadow-black/50">
             <div className="flex items-center gap-2 px-4 py-3 border-b border-zinc-800 bg-zinc-950/50">
               <div className="w-3 h-3 rounded-full bg-red-500/70"></div>
@@ -156,7 +156,7 @@ export function LandingPage({ onEnter }: { onEnter: (role: Role) => void }) {
         </div>
 
         {/* STATS BAR */}
-        <div className="relative z-10 mt-8 w-full max-w-3xl mx-auto grid grid-cols-2 md:grid-cols-4 gap-3 text-center">
+        <div className="relative z-10 mt-6 w-full max-w-3xl mx-auto grid grid-cols-2 md:grid-cols-4 gap-2 text-center">
           {[
             { label: "POWERED BY MIDEN", value: "ZK Rollup" },
             { label: "ZERO-KNOWLEDGE", value: "Client-side Proving" },
@@ -172,14 +172,14 @@ export function LandingPage({ onEnter }: { onEnter: (role: Role) => void }) {
       </section>
 
       {/* HOW IT WORKS */}
-      <section id="how-it-works" className="py-24 px-6 border-t border-zinc-900">
+      <section id="how-it-works" className="py-16 md:py-24 px-6 border-t border-zinc-900">
         <div className="max-w-5xl mx-auto space-y-12">
           <div className="text-center space-y-3">
             <p className="text-orange-400 text-xs font-semibold uppercase tracking-wider">HOW IT WORKS</p>
             <h2 className="text-3xl md:text-4xl font-bold">Four steps.<br />Zero exposure.</h2>
             <p className="text-zinc-500 text-sm max-w-md mx-auto">Everything runs on Miden's zero-knowledge infrastructure. Your salary data never touches a public ledger.</p>
           </div>
-          <div className="grid md:grid-cols-4 gap-4">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
             {[
               { num: "01", icon: "◈", label: "VAULT", title: "Fund Your Private Treasury", desc: "Deposit assets into your shielded treasury. The balance is encrypted — only you can see it, but it's cryptographically verifiable." },
               { num: "02", icon: "◎", label: "TEAM", title: "Add Your Team", desc: "Add team members by their Miden wallet address and set their salary in full privacy. No names or amounts go on-chain." },
@@ -203,7 +203,7 @@ export function LandingPage({ onEnter }: { onEnter: (role: Role) => void }) {
       </section>
 
       {/* BUILT FOR PRIVACY */}
-      <section className="py-24 px-6 border-t border-zinc-900">
+      <section className="py-16 md:py-24 px-6 border-t border-zinc-900">
         <div className="max-w-5xl mx-auto">
           <div className="grid md:grid-cols-2 gap-12 items-center">
             <div className="space-y-5">
@@ -216,7 +216,7 @@ export function LandingPage({ onEnter }: { onEnter: (role: Role) => void }) {
                 Launch App
               </button>
             </div>
-            <div className="grid grid-cols-2 gap-3">
+            <div className="grid grid-cols-2 gap-2">
               {[
                 { icon: "🔐", title: "Private Vault", desc: "Treasury balance shielded using Miden's ZK proofs — only you can see the balance or trigger withdrawals." },
                 { icon: "◎", title: "Team Management", desc: "Add members at any time. Wallet addresses and salary info encrypted — not readable without your keys." },
@@ -237,13 +237,13 @@ export function LandingPage({ onEnter }: { onEnter: (role: Role) => void }) {
       </section>
 
       {/* FEATURES */}
-      <section id="features" className="py-24 px-6 border-t border-zinc-900">
+      <section id="features" className="py-16 md:py-24 px-6 border-t border-zinc-900">
         <div className="max-w-5xl mx-auto space-y-12">
           <div className="text-center space-y-2">
             <p className="text-orange-400 text-xs font-semibold uppercase tracking-wider">CORE FEATURES</p>
             <h2 className="text-3xl font-bold">Built for privacy.<br />Trusted by teams.</h2>
           </div>
-          <div className="grid md:grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3">
             {[
               { icon: "🛡", title: "Shielded Salary Disbursement", desc: "Employee compensation encrypted at circuit level. Amounts and addresses never broadcast on-chain in plaintext.", tag: "ZK-native" },
               { icon: "◈", title: "Private Treasury Vault", desc: "Treasury balance cryptographically sealed. Publicly auditable for solvency, but opaque to competitors.", tag: "Miden STARK" },
@@ -266,7 +266,7 @@ export function LandingPage({ onEnter }: { onEnter: (role: Role) => void }) {
       </section>
 
       {/* FAQ */}
-      <section className="py-24 px-6 border-t border-zinc-900">
+      <section className="py-16 md:py-24 px-6 border-t border-zinc-900">
         <div className="max-w-3xl mx-auto space-y-10">
           <div className="text-center space-y-2">
             <h2 className="text-3xl md:text-4xl font-bold">Questions we get asked.<br />Answers you can trust.</h2>
@@ -287,7 +287,7 @@ export function LandingPage({ onEnter }: { onEnter: (role: Role) => void }) {
       </section>
 
       {/* MIDEN */}
-      <section id="miden" className="py-24 px-6 border-t border-zinc-900">
+      <section id="miden" className="py-16 md:py-24 px-6 border-t border-zinc-900">
         <div className="max-w-4xl mx-auto">
           <div className="relative bg-gradient-to-br from-orange-950/20 via-zinc-900/40 to-zinc-950 border border-orange-900/20 rounded-2xl p-8 md:p-12 overflow-hidden">
             <div className="absolute top-0 right-0 w-[350px] h-[350px] bg-orange-500/5 rounded-full blur-[80px] pointer-events-none"></div>
@@ -328,7 +328,7 @@ export function LandingPage({ onEnter }: { onEnter: (role: Role) => void }) {
       </section>
 
       {/* FINAL CTA */}
-      <section className="py-24 px-6 border-t border-zinc-900">
+      <section className="py-16 md:py-24 px-6 border-t border-zinc-900">
         <div className="max-w-2xl mx-auto text-center space-y-6">
           <p className="text-orange-400 text-xs font-semibold uppercase tracking-wider">GET STARTED</p>
           <h2 className="text-3xl md:text-4xl font-bold leading-tight">Pay your team.<br />Show the chain nothing.</h2>
