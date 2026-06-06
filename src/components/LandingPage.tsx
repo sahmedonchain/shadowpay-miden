@@ -208,7 +208,7 @@ export function LandingPage({ onEnter }: { onEnter: (role: Role) => void }) {
           <div className="grid md:grid-cols-2 gap-12 items-center">
             <div className="space-y-5">
               <p className="text-orange-400 text-xs font-semibold uppercase tracking-wider">ZERO-KNOWLEDGE PAYROLL</p>
-              <h2 className="text-3xl md:text-4xl font-bold leading-tight">Built for privacy.<br />Designed for every team.</h2>
+              <h2 className="text-2xl md:text-4xl font-bold leading-tight">Built for privacy. Designed for every team.</h2>
               <p className="text-zinc-400 text-sm leading-relaxed">
                 From a 2-person DAO to a 500-person company, ShadowPay gives you payroll that runs correctly and privately — not needing a single salary to appear on a public chain.
               </p>
@@ -241,7 +241,7 @@ export function LandingPage({ onEnter }: { onEnter: (role: Role) => void }) {
         <div className="max-w-5xl mx-auto space-y-12">
           <div className="text-center space-y-2">
             <p className="text-orange-400 text-xs font-semibold uppercase tracking-wider">CORE FEATURES</p>
-            <h2 className="text-3xl font-bold">Built for privacy.<br />Trusted by teams.</h2>
+            <h2 className="text-xl md:text-3xl font-bold">Built for privacy.<br />Trusted by teams.</h2>
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3">
             {[
@@ -269,7 +269,7 @@ export function LandingPage({ onEnter }: { onEnter: (role: Role) => void }) {
       <section className="py-16 md:py-24 px-6 border-t border-zinc-900">
         <div className="max-w-3xl mx-auto space-y-10">
           <div className="text-center space-y-2">
-            <h2 className="text-3xl md:text-4xl font-bold">Questions we get asked.<br />Answers you can trust.</h2>
+            <h2 className="text-xl md:text-4xl font-bold">Questions we get asked. Answers you can trust.</h2>
           </div>
           <div className="space-y-8">
             {faqs.map((section) => (
@@ -301,7 +301,7 @@ export function LandingPage({ onEnter }: { onEnter: (role: Role) => void }) {
                   <p className="text-zinc-500 text-xs">Zero-knowledge blockchain</p>
                 </div>
               </div>
-              <h2 className="text-2xl md:text-3xl font-bold">Pay your team.<br />Show the chain nothing.</h2>
+              <h2 className="text-2xl md:text-4xl font-bold leading-tight">Pay your team.<br />Show the chain nothing.</h2>
               <p className="text-zinc-400 text-sm leading-relaxed max-w-xl">
                 ShadowPay is live on Miden Testnet. Connect your wallet, run real payroll flows, and experience what private onchain payments actually feel like.
               </p>
@@ -331,7 +331,7 @@ export function LandingPage({ onEnter }: { onEnter: (role: Role) => void }) {
       <section className="py-16 md:py-24 px-6 border-t border-zinc-900">
         <div className="max-w-2xl mx-auto text-center space-y-6">
           <p className="text-orange-400 text-xs font-semibold uppercase tracking-wider">GET STARTED</p>
-          <h2 className="text-3xl md:text-4xl font-bold leading-tight">Pay your team.<br />Show the chain nothing.</h2>
+          <h2 className="text-xl md:text-3xl font-bold">Pay your team. Show the chain nothing.</h2>
           <p className="text-zinc-500 text-sm leading-relaxed">
             ShadowPay is live on Miden Testnet. Connect your wallet and run real payroll flows today — no lock-ups, no approvals, no exposed salaries.
           </p>
