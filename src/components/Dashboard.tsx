@@ -2,9 +2,10 @@ import { useEffect, useState } from "react";
 import { blockchain } from "@/lib/blockchain";
 import { eventBus } from "@/lib/event";
 import type { DBType } from "@/lib/db";
+import type { Role } from "@/lib/role";
 import { useMidenFiWallet } from "@miden-sdk/miden-wallet-adapter-react";
 
-export function Dashboard() {
+export function Dashboard({ role }: { role: Role }) {
   const [data, setData] = useState<DBType | null>(null);
   const { connected, address } = useMidenFiWallet();
 
@@ -19,74 +20,152 @@ export function Dashboard() {
   const approved = data.payrolls.filter((p) => p.status === "approved").length;
   const claimed = data.payrolls.filter((p) => p.status === "claimed").length;
   const totalPaid = data.payrolls.filter((p) => p.status === "claimed").reduce((s, p) => s + p.amount, 0);
-  const health = data.treasury > 50000 ? "🟢 Healthy" : data.treasury > 10000 ? "🟡 Medium" : "🔴 Low";
   const transactions = Array.isArray(data.transactions) ? data.transactions : [];
 
+  const healthColor = data.treasury > 50000 ? "text-green-400" : data.treasury > 10000 ? "text-yellow-400" : "text-red-400";
+  const healthLabel = data.treasury > 50000 ? "Healthy" : data.treasury > 10000 ? "Medium" : "Low";
+  const healthDot = data.treasury > 50000 ? "bg-green-400" : data.treasury > 10000 ? "bg-yellow-400" : "bg-red-400";
+
   return (
-    <div className="p-6 md:p-10 space-y-6">
-      <div>
-        <h1 className="text-2xl md:text-3xl font-bold">Dashboard</h1>
-        <p className="text-zinc-500 text-sm mt-1">Private payroll & treasury on Miden</p>
-      </div>
+    <div className="space-y-5 max-w-4xl">
 
-      <div className="bg-zinc-900 border border-zinc-800 rounded-xl p-4 flex flex-wrap gap-4 text-sm">
-        <span className="text-zinc-400">Miden Testnet</span>
-        <span className="text-green-400">● Connected</span>
-        {connected && address ? (
-          <span className="text-zinc-500 truncate">Wallet: {address.slice(0, 16)}...</span>
-        ) : (
-          <span className="text-yellow-400">⚠ Connect wallet to transact</span>
-        )}
-      </div>
-
-      <div className="grid grid-cols-2 gap-3">
-        <div className="bg-zinc-900 p-4 rounded-xl border border-zinc-800">
-          <p className="text-zinc-400 text-xs">Treasury</p>
-          <h2 className="text-xl font-bold mt-1">{data.treasury.toLocaleString()}</h2>
-          <p className="text-xs mt-1">{health}</p>
+      {/* HEADER */}
+      <div className="flex items-start justify-between flex-wrap gap-3">
+        <div>
+          <h1 className="text-xl md:text-2xl font-bold text-white">Dashboard</h1>
+          <p className="text-zinc-500 text-sm mt-0.5">Private payroll & treasury on Miden</p>
         </div>
-        <div className="bg-zinc-900 p-4 rounded-xl border border-zinc-800">
-          <p className="text-zinc-400 text-xs">Employees</p>
-          <h2 className="text-xl font-bold mt-1">{data.employees.length}</h2>
-        </div>
-        <div className="bg-zinc-900 p-4 rounded-xl border border-zinc-800">
-          <p className="text-zinc-400 text-xs">Total Paid</p>
-          <h2 className="text-xl font-bold mt-1">{totalPaid.toLocaleString()}</h2>
-        </div>
-        <div className="bg-zinc-900 p-4 rounded-xl border border-zinc-800">
-          <p className="text-zinc-400 text-xs">Pending</p>
-          <h2 className="text-xl font-bold mt-1">{pending}</h2>
+        <div className={`flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-medium border ${
+          connected ? "bg-green-950/50 border-green-800/50 text-green-400" : "bg-yellow-950/50 border-yellow-800/50 text-yellow-400"
+        }`}>
+          <div className={`w-1.5 h-1.5 rounded-full ${connected ? "bg-green-400" : "bg-yellow-400"}`}></div>
+          {connected ? "Testnet Connected" : "Wallet Not Connected"}
         </div>
       </div>
 
-      <div className="grid grid-cols-3 gap-3">
-        <div className="bg-zinc-900 p-3 rounded-xl border border-zinc-800 text-center">
-          <p className="text-zinc-400 text-xs">Pending</p>
-          <p className="text-lg font-bold text-yellow-400">{pending}</p>
+      {/* ROLE BANNER */}
+      <div className={`rounded-xl border p-4 flex items-center gap-3 ${
+        role === "employer" ? "bg-violet-600/10 border-violet-600/20" : "bg-green-600/10 border-green-600/20"
+      }`}>
+        <div className={`w-8 h-8 rounded-full flex items-center justify-center shrink-0 ${
+          role === "employer" ? "bg-violet-600/20" : "bg-green-600/20"
+        }`}>
+          <span className={`text-sm ${role === "employer" ? "text-violet-400" : "text-green-400"}`}>
+            {role === "employer" ? "◆" : "◉"}
+          </span>
         </div>
-        <div className="bg-zinc-900 p-3 rounded-xl border border-zinc-800 text-center">
-          <p className="text-zinc-400 text-xs">Approved</p>
-          <p className="text-lg font-bold text-blue-400">{approved}</p>
-        </div>
-        <div className="bg-zinc-900 p-3 rounded-xl border border-zinc-800 text-center">
-          <p className="text-zinc-400 text-xs">Claimed</p>
-          <p className="text-lg font-bold text-green-400">{claimed}</p>
+        <div>
+          <p className="text-sm font-medium text-white">
+            {role === "employer" ? "Employer Dashboard" : "Employee Dashboard"}
+          </p>
+          <p className="text-xs text-zinc-500">
+            {role === "employer"
+              ? "Manage treasury, team, and payroll approvals"
+              : "View your pending salary claims below"}
+          </p>
         </div>
       </div>
 
-      <div className="bg-zinc-900 p-5 rounded-xl border border-zinc-800">
-        <h3 className="font-semibold mb-3 text-sm">Transaction Log</h3>
+      {/* WALLET INFO */}
+      {connected && address && (
+        <div className="bg-zinc-900/50 border border-zinc-800/50 rounded-xl p-3 flex items-center gap-3">
+          <div className="w-8 h-8 rounded-full bg-violet-600/20 border border-violet-600/30 flex items-center justify-center shrink-0">
+            <span className="text-violet-400 text-xs">M</span>
+          </div>
+          <div className="min-w-0">
+            <p className="text-xs text-zinc-400">Connected Wallet</p>
+            <p className="text-xs text-zinc-300 font-mono truncate">{address}</p>
+          </div>
+        </div>
+      )}
+
+      {/* STATS */}
+      {role === "employer" ? (
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+          <div className="bg-zinc-900/50 border border-zinc-800/50 rounded-xl p-4">
+            <p className="text-zinc-500 text-xs mb-1">Treasury</p>
+            <p className="text-xl font-bold text-white">{data.treasury.toLocaleString()}</p>
+            <div className="flex items-center gap-1.5 mt-1.5">
+              <div className={`w-1.5 h-1.5 rounded-full ${healthDot}`}></div>
+              <span className={`text-xs ${healthColor}`}>{healthLabel}</span>
+            </div>
+          </div>
+          <div className="bg-zinc-900/50 border border-zinc-800/50 rounded-xl p-4">
+            <p className="text-zinc-500 text-xs mb-1">Employees</p>
+            <p className="text-xl font-bold text-white">{data.employees.length}</p>
+            <p className="text-xs text-zinc-600 mt-1.5">team members</p>
+          </div>
+          <div className="bg-zinc-900/50 border border-zinc-800/50 rounded-xl p-4">
+            <p className="text-zinc-500 text-xs mb-1">Total Paid</p>
+            <p className="text-xl font-bold text-white">{totalPaid.toLocaleString()}</p>
+            <p className="text-xs text-zinc-600 mt-1.5">lifetime</p>
+          </div>
+          <div className="bg-zinc-900/50 border border-zinc-800/50 rounded-xl p-4">
+            <p className="text-zinc-500 text-xs mb-1">Pending</p>
+            <p className="text-xl font-bold text-yellow-400">{pending}</p>
+            <p className="text-xs text-zinc-600 mt-1.5">awaiting approval</p>
+          </div>
+        </div>
+      ) : (
+        <div className="grid grid-cols-2 gap-3">
+          <div className="bg-zinc-900/50 border border-zinc-800/50 rounded-xl p-4">
+            <p className="text-zinc-500 text-xs mb-1">Ready to Claim</p>
+            <p className="text-xl font-bold text-green-400">{approved}</p>
+            <p className="text-xs text-zinc-600 mt-1.5">approved payments</p>
+          </div>
+          <div className="bg-zinc-900/50 border border-zinc-800/50 rounded-xl p-4">
+            <p className="text-zinc-500 text-xs mb-1">Total Received</p>
+            <p className="text-xl font-bold text-white">{totalPaid.toLocaleString()}</p>
+            <p className="text-xs text-zinc-600 mt-1.5">claimed</p>
+          </div>
+        </div>
+      )}
+
+      {/* PAYROLL STATUS (employer only) */}
+      {role === "employer" && (
+        <div className="grid grid-cols-3 gap-3">
+          <div className="bg-zinc-900/50 border border-zinc-800/50 rounded-xl p-4 text-center">
+            <p className="text-zinc-500 text-xs mb-2">Pending</p>
+            <p className="text-2xl font-bold text-yellow-400">{pending}</p>
+          </div>
+          <div className="bg-zinc-900/50 border border-zinc-800/50 rounded-xl p-4 text-center">
+            <p className="text-zinc-500 text-xs mb-2">Approved</p>
+            <p className="text-2xl font-bold text-blue-400">{approved}</p>
+          </div>
+          <div className="bg-zinc-900/50 border border-zinc-800/50 rounded-xl p-4 text-center">
+            <p className="text-zinc-500 text-xs mb-2">Claimed</p>
+            <p className="text-2xl font-bold text-green-400">{claimed}</p>
+          </div>
+        </div>
+      )}
+
+      {/* TRANSACTION LOG */}
+      <div className="bg-zinc-900/50 border border-zinc-800/50 rounded-xl p-5">
+        <h3 className="text-sm font-semibold text-white mb-4">
+          {role === "employer" ? "Recent Transactions" : "Payment History"}
+        </h3>
         {transactions.length === 0 ? (
-          <p className="text-zinc-500 text-sm">No transactions yet</p>
+          <div className="text-center py-6">
+            <p className="text-zinc-600 text-sm">No transactions yet</p>
+          </div>
         ) : (
           <div className="space-y-2">
             {[...transactions].reverse().slice(0, 8).map((t) => (
-              <div key={t.id} className="flex justify-between text-xs gap-2">
-                <span className={`font-medium shrink-0 ${t.type === "DEDUCT" ? "text-red-400" : "text-green-400"}`}>
-                  {t.type === "DEDUCT" ? "−" : "+"}{t.amount}
-                </span>
-                <span className="text-zinc-400 truncate">{t.reason}</span>
-                <span className="text-zinc-600 shrink-0">{new Date(t.timestamp).toLocaleTimeString()}</span>
+              <div key={t.id} className="flex items-center justify-between py-2 border-b border-zinc-800/50 last:border-0 gap-3">
+                <div className="flex items-center gap-3">
+                  <div className={`w-6 h-6 rounded-full flex items-center justify-center text-xs shrink-0 ${
+                    t.type === "DEDUCT" ? "bg-red-950 text-red-400" : "bg-green-950 text-green-400"
+                  }`}>
+                    {t.type === "DEDUCT" ? "−" : "+"}
+                  </div>
+                  <span className="text-zinc-400 text-xs truncate max-w-[140px] md:max-w-xs">{t.reason}</span>
+                </div>
+                <div className="text-right shrink-0 ml-2">
+                  <p className={`text-sm font-medium ${t.type === "DEDUCT" ? "text-red-400" : "text-green-400"}`}>
+                    {t.type === "DEDUCT" ? "−" : "+"}{t.amount.toLocaleString()}
+                  </p>
+                  <p className="text-zinc-600 text-[10px]">{new Date(t.timestamp).toLocaleTimeString()}</p>
+                </div>
               </div>
             ))}
           </div>

@@ -8,9 +8,9 @@ export const blockchain = {
     return db.get();
   },
 
-  addEmployee(name: string, salary: number) {
+  addEmployee(name: string, salary: number, walletAddress?: string) {
     const data = db.get();
-    const employee = { id: createId(), name, salary };
+    const employee = { id: createId(), name, salary, walletAddress };
     db.set({ ...data, employees: [...data.employees, employee] });
     return employee;
   },
@@ -73,11 +73,21 @@ export const blockchain = {
     return true;
   },
 
-  claimPayroll(payrollId: string) {
+  claimPayroll(payrollId: string, claimerAddress?: string) {
     const data = db.get();
     const payroll = data.payrolls.find((p) => p.id === payrollId);
     if (!payroll || payroll.status !== "approved") return false;
     if (!payroll.proof || !proofEngine.verify(payroll.proof)) return false;
+
+    // wallet address verification
+    if (claimerAddress) {
+      const employee = data.employees.find((e) => e.id === payroll.employeeId);
+      if (employee?.walletAddress) {
+        if (employee.walletAddress.toLowerCase() !== claimerAddress.toLowerCase()) {
+          return "wallet_mismatch";
+        }
+      }
+    }
 
     const updated = data.payrolls.map((p) =>
       p.id === payrollId ? { ...p, status: "claimed" as const } : p
@@ -109,7 +119,6 @@ export const blockchain = {
     if (!payroll || payroll.status === "claimed") return false;
 
     if (payroll.status === "approved") {
-      // refund treasury
       const transaction = {
         id: createId(),
         type: "ADD" as const,

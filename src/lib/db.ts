@@ -5,6 +5,7 @@ export type Employee = {
   id: string;
   name: string;
   salary: number;
+  walletAddress?: string;
 };
 
 export type Payroll = {
@@ -46,7 +47,10 @@ export const getDB = (): DBType => {
   const parsed = JSON.parse(raw);
   return {
     treasury: parsed.treasury ?? 100000,
-    employees: parsed.employees ?? [],
+    employees: (parsed.employees ?? []).map((e: Employee) => ({
+      ...e,
+      walletAddress: e.walletAddress ?? undefined,
+    })),
     payrolls: (parsed.payrolls ?? []).map((p: Payroll) => ({
       ...p,
       createdAt: p.createdAt ?? Date.now(),

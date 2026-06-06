@@ -1,92 +1,127 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useMiden } from "@miden-sdk/react";
 import { useMidenFiWallet } from "@miden-sdk/miden-wallet-adapter-react";
 import { WalletReadyState } from "@miden-sdk/miden-wallet-adapter-base";
-
 import { Dashboard } from "./Dashboard";
 import { Employees } from "./Employees";
 import { Payroll } from "./Payroll";
 import { Claim } from "./Claim";
 import { Treasury } from "./Treasury";
+import { RoleSelect } from "./RoleSelect";
+import { LandingPage } from "./LandingPage";
+import { roleStore, employerAuth, type Role } from "@/lib/role";
 
 type Page = "dashboard" | "employees" | "payroll" | "claim" | "treasury";
 
-const navLinks = [
-  { id: "dashboard", label: "Home", icon: "⬡" },
-  { id: "treasury", label: "Vault", icon: "◈" },
-  { id: "employees", label: "Team", icon: "◎" },
-  { id: "payroll", label: "Payroll", icon: "◆" },
-  { id: "claim", label: "Claim", icon: "◉" },
+const employerNav = [
+  { id: "dashboard" as Page, label: "Home", icon: "⬡" },
+  { id: "treasury" as Page, label: "Vault", icon: "◈" },
+  { id: "employees" as Page, label: "Team", icon: "◎" },
+  { id: "payroll" as Page, label: "Payroll", icon: "◆" },
+] as const;
+
+const employeeNav = [
+  { id: "dashboard" as Page, label: "Home", icon: "⬡" },
+  { id: "claim" as Page, label: "Claim", icon: "◉" },
 ] as const;
 
 function WalletButton() {
-  const { wallet, connected, connecting, connect, disconnect } =
-    useMidenFiWallet();
-
+  const { wallet, connected, connecting, connect, disconnect } = useMidenFiWallet();
   const ready =
     wallet?.readyState === WalletReadyState.Installed ||
     wallet?.readyState === WalletReadyState.Loadable;
 
-  if (!ready)
-    return (
-      <button className="w-full rounded-xl bg-zinc-900 px-3 py-2 text-xs text-zinc-500">
-        Install Wallet
-      </button>
-    );
-
-  if (connecting)
-    return (
-      <button className="w-full rounded-xl bg-zinc-900 px-3 py-2 text-xs text-zinc-400 animate-pulse">
-        Connecting...
-      </button>
-    );
-
-  if (connected)
-    return (
-      <button
-        onClick={disconnect}
-        className="w-full rounded-xl bg-red-950/40 border border-red-900/40 px-3 py-2 text-xs text-red-300"
-      >
-        Disconnect
-      </button>
-    );
-
+  if (!ready) return (
+    <button className="w-full rounded-xl bg-zinc-900 px-3 py-2 text-xs text-zinc-500">
+      Install Wallet
+    </button>
+  );
+  if (connecting) return (
+    <button className="w-full rounded-xl bg-zinc-900 px-3 py-2 text-xs text-zinc-400 animate-pulse">
+      Connecting...
+    </button>
+  );
+  if (connected) return (
+    <button onClick={disconnect} className="w-full rounded-xl bg-red-950/40 border border-red-900/40 px-3 py-2 text-xs text-red-300">
+      Disconnect
+    </button>
+  );
   return (
-    <button
-      onClick={connect}
-      className="w-full rounded-xl bg-violet-600 px-3 py-2 text-xs font-medium text-white"
-    >
+    <button onClick={connect} className="w-full rounded-xl bg-violet-600 px-3 py-2 text-xs font-medium text-white">
       Connect Wallet
     </button>
   );
 }
 
 export function ShadowPayApp() {
+  const [showLanding, setShowLanding] = useState(true);
+  const [role, setRole] = useState<Role | null>(null);
   const [page, setPage] = useState<Page>("dashboard");
   const [menuOpen, setMenuOpen] = useState(false);
-
   const { isReady, isInitializing, error } = useMiden();
   const { address } = useMidenFiWallet();
 
-  if (error) {
-    return (
-      <div className="flex min-h-screen items-center justify-center bg-black text-white">
-        <div className="text-center">
-          <p className="text-red-400">System Error</p>
-          <p className="text-zinc-500 text-sm">{error.message}</p>
-        </div>
-      </div>
-    );
-  }
+  useEffect(() => {
+    const saved = roleStore.get();
+    if (saved) {
+      if (saved === "employer" && !employerAuth.isAuthenticated()) {
+        roleStore.clear();
+        return;
+      }
+      setRole(saved);
+      setShowLanding(false);
+    }
+  }, []);
 
-  if (isInitializing || !isReady) {
-    return (
-      <div className="flex min-h-screen items-center justify-center bg-black">
-        <div className="h-6 w-6 animate-spin rounded-full border-2 border-violet-500 border-t-transparent"></div>
+  const handleRoleSelect = (r: Role) => {
+    roleStore.set(r);
+    setRole(r);
+    setPage("dashboard");
+    setShowLanding(false);
+  };
+
+  const handleRoleChange = () => {
+    employerAuth.logout();
+    roleStore.clear();
+    setRole(null);
+    setPage("dashboard");
+    setMenuOpen(false);
+    setShowLanding(true);
+  };
+
+  const handleLandingEnter = (r: Role) => {
+    if (r === "employee") {
+      roleStore.set("employee");
+      setRole("employee");
+      setPage("dashboard");
+      setShowLanding(false);
+    } else {
+      // employer → PIN screen
+      setShowLanding(false);
+    }
+  };
+
+  if (error) return (
+    <div className="flex min-h-screen items-center justify-center bg-black text-white">
+      <div className="text-center">
+        <p className="text-red-400">System Error</p>
+        <p className="text-zinc-500 text-sm">{error.message}</p>
       </div>
-    );
-  }
+    </div>
+  );
+
+  if (isInitializing || !isReady) return (
+    <div className="flex min-h-screen items-center justify-center bg-black">
+      <div className="h-6 w-6 animate-spin rounded-full border-2 border-violet-500 border-t-transparent"></div>
+    </div>
+  );
+
+  if (showLanding) return <LandingPage onEnter={handleLandingEnter} />;
+
+  if (!role) return <RoleSelect onSelect={handleRoleSelect} />;
+
+  const navLinks = role === "employer" ? employerNav : employeeNav;
 
   return (
     <div className="flex min-h-screen w-full bg-black text-white overflow-hidden">
@@ -104,11 +139,37 @@ export function ShadowPayApp() {
         )}
       </AnimatePresence>
 
-      {/* DESKTOP SIDEBAR (FIXED WIDTH) */}
+      {/* DESKTOP SIDEBAR */}
       <aside className="hidden md:flex w-64 flex-col border-r border-zinc-900 bg-zinc-950">
         <div className="p-5 border-b border-zinc-900">
-          <h1 className="font-bold text-lg">ShadowPay</h1>
-          <p className="text-[10px] text-zinc-500">Finance OS</p>
+          <div className="flex items-center gap-2">
+            <div className="w-7 h-7 rounded-lg bg-violet-600 flex items-center justify-center">
+              <span className="text-white text-xs font-bold">S</span>
+            </div>
+            <div>
+              <h1 className="font-bold text-sm text-white">ShadowPay</h1>
+              <p className="text-[10px] text-zinc-500">Miden Testnet</p>
+            </div>
+          </div>
+        </div>
+
+        {/* ROLE BADGE */}
+        <div className="px-4 py-3 border-b border-zinc-900">
+          <div className={`flex items-center justify-between px-3 py-2 rounded-xl border ${
+            role === "employer"
+              ? "bg-violet-600/10 border-violet-600/20"
+              : "bg-green-600/10 border-green-600/20"
+          }`}>
+            <div className="flex items-center gap-2">
+              <div className={`w-1.5 h-1.5 rounded-full ${role === "employer" ? "bg-violet-400" : "bg-green-400"}`}></div>
+              <span className={`text-xs font-medium ${role === "employer" ? "text-violet-300" : "text-green-300"}`}>
+                {role === "employer" ? "Employer" : "Employee"}
+              </span>
+            </div>
+            <button onClick={handleRoleChange} className="text-[10px] text-zinc-600 hover:text-zinc-400 transition">
+              {role === "employer" ? "Logout" : "Switch"}
+            </button>
+          </div>
         </div>
 
         <nav className="flex-1 p-3 space-y-1">
@@ -118,7 +179,9 @@ export function ShadowPayApp() {
               onClick={() => setPage(l.id)}
               className={`w-full flex items-center gap-3 rounded-xl px-3 py-2 text-sm transition ${
                 page === l.id
-                  ? "bg-violet-500/10 text-violet-300"
+                  ? role === "employer"
+                    ? "bg-violet-500/10 text-violet-300"
+                    : "bg-green-500/10 text-green-300"
                   : "text-zinc-500 hover:bg-zinc-900"
               }`}
             >
@@ -131,20 +194,27 @@ export function ShadowPayApp() {
         <div className="p-3 border-t border-zinc-900 space-y-2">
           <WalletButton />
           {address && (
-            <p className="text-[10px] text-zinc-600 truncate">
-              {address}
-            </p>
+            <p className="text-[10px] text-zinc-600 truncate">{address}</p>
           )}
         </div>
       </aside>
 
       {/* MOBILE TOPBAR */}
       <div className="fixed top-0 left-0 right-0 z-30 md:hidden flex justify-between items-center px-4 py-3 bg-black border-b border-zinc-900">
-        <div className="font-bold text-sm">ShadowPay</div>
-        <button
-          onClick={() => setMenuOpen(!menuOpen)}
-          className="px-3 py-1 rounded bg-zinc-900 text-xs"
-        >
+        <div className="flex items-center gap-2">
+          <div className="w-5 h-5 rounded-md bg-violet-600 flex items-center justify-center">
+            <span className="text-white text-[10px] font-bold">S</span>
+          </div>
+          <span className="font-bold text-sm">ShadowPay</span>
+          <span className={`text-[10px] px-1.5 py-0.5 rounded-full border ${
+            role === "employer"
+              ? "bg-violet-600/10 border-violet-600/20 text-violet-400"
+              : "bg-green-600/10 border-green-600/20 text-green-400"
+          }`}>
+            {role === "employer" ? "Employer" : "Employee"}
+          </span>
+        </div>
+        <button onClick={() => setMenuOpen(!menuOpen)} className="px-3 py-1 rounded bg-zinc-900 text-xs">
           ☰
         </button>
       </div>
@@ -158,28 +228,45 @@ export function ShadowPayApp() {
             exit={{ x: -300 }}
             className="fixed left-0 top-0 z-50 h-full w-72 bg-zinc-950 p-4 md:hidden"
           >
+            <div className="mb-4 pb-4 border-b border-zinc-900 flex items-center gap-2">
+              <div className="w-6 h-6 rounded-md bg-violet-600 flex items-center justify-center">
+                <span className="text-white text-xs font-bold">S</span>
+              </div>
+              <div>
+                <h1 className="font-bold text-sm">ShadowPay</h1>
+                <p className="text-[10px] text-zinc-500">Miden Testnet</p>
+              </div>
+            </div>
+
             {navLinks.map((l) => (
               <button
                 key={l.id}
-                onClick={() => {
-                  setPage(l.id);
-                  setMenuOpen(false);
-                }}
-                className="w-full flex items-center gap-3 rounded-xl px-3 py-2 text-sm text-zinc-400 hover:bg-zinc-900"
+                onClick={() => { setPage(l.id); setMenuOpen(false); }}
+                className={`w-full flex items-center gap-3 rounded-xl px-3 py-2 text-sm mb-1 ${
+                  page === l.id
+                    ? role === "employer" ? "bg-violet-500/10 text-violet-300" : "bg-green-500/10 text-green-300"
+                    : "text-zinc-400 hover:bg-zinc-900"
+                }`}
               >
                 <span>{l.icon}</span>
                 {l.label}
               </button>
             ))}
 
-            <div className="mt-4">
+            <div className="mt-4 space-y-2 border-t border-zinc-900 pt-4">
               <WalletButton />
+              <button
+                onClick={handleRoleChange}
+                className="w-full text-xs text-zinc-600 hover:text-zinc-400 py-2 transition"
+              >
+                {role === "employer" ? "Logout" : "Switch Role"}
+              </button>
             </div>
           </motion.div>
         )}
       </AnimatePresence>
 
-      {/* MAIN CONTENT (🔥 FIXED FULL WIDTH SYSTEM) */}
+      {/* MAIN CONTENT */}
       <main className="flex-1 w-full min-w-0 md:w-[calc(100%-16rem)] pt-14 md:pt-6 pb-24 overflow-y-auto px-4 md:px-8">
         <AnimatePresence mode="wait">
           <motion.div
@@ -188,24 +275,26 @@ export function ShadowPayApp() {
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -10 }}
           >
-            {page === "dashboard" && <Dashboard />}
-            {page === "treasury" && <Treasury />}
-            {page === "employees" && <Employees />}
-            {page === "payroll" && <Payroll />}
-            {page === "claim" && <Claim />}
+            {page === "dashboard" && <Dashboard role={role} />}
+            {page === "treasury" && role === "employer" && <Treasury />}
+            {page === "employees" && role === "employer" && <Employees />}
+            {page === "payroll" && role === "employer" && <Payroll />}
+            {page === "claim" && <Claim role={role} />}
           </motion.div>
         </AnimatePresence>
       </main>
 
       {/* MOBILE BOTTOM NAV */}
       <div className="fixed bottom-0 left-0 right-0 z-30 md:hidden border-t border-zinc-900 bg-black pb-[env(safe-area-inset-bottom)]">
-        <div className="grid grid-cols-5 text-[10px]">
+        <div className="grid text-[10px]" style={{ gridTemplateColumns: `repeat(${navLinks.length}, 1fr)` }}>
           {navLinks.map((l) => (
             <button
               key={l.id}
               onClick={() => setPage(l.id)}
               className={`py-2 flex flex-col items-center ${
-                page === l.id ? "text-violet-400" : "text-zinc-500"
+                page === l.id
+                  ? role === "employer" ? "text-violet-400" : "text-green-400"
+                  : "text-zinc-500"
               }`}
             >
               <span className="text-base">{l.icon}</span>
@@ -214,6 +303,7 @@ export function ShadowPayApp() {
           ))}
         </div>
       </div>
+
     </div>
   );
 }
