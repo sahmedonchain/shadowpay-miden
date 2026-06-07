@@ -43,7 +43,13 @@ function WalletButton() {
     </button>
   );
   if (connected) return (
-    <button onClick={disconnect} className="w-full rounded-xl bg-red-950/40 border border-red-900/40 px-3 py-2 text-xs text-red-300">
+    <button
+      onClick={async () => {
+        await disconnect();
+        window.location.reload();
+      }}
+      className="w-full rounded-xl bg-red-950/40 border border-red-900/40 px-3 py-2 text-xs text-red-300"
+    >
       Disconnect
     </button>
   );
