@@ -60,7 +60,7 @@ function WalletButton() {
   );
 }
 
-export function ShadowPayApp() {
+export function ShadowPayApp({ pendingRole }: { pendingRole?: Role | null }) {
   const [showLanding, setShowLanding] = useState(true);
   const [role, setRole] = useState<Role | null>(null);
   const [page, setPage] = useState<Page>("dashboard");
@@ -69,16 +69,27 @@ export function ShadowPayApp() {
   const { address } = useMidenFiWallet();
 
   useEffect(() => {
-    const saved = roleStore.get();
-    if (saved) {
-      if (saved === "employer" && !employerAuth.isAuthenticated()) {
-        roleStore.clear();
-        return;
-      }
-      setRole(saved);
-      setShowLanding(false);
+  // pendingRole from landing page
+  if (pendingRole === "employee" && !role) {
+    setRole("employee");
+    setShowLanding(false);
+    return;
+  }
+  if (pendingRole === "employer" && !role) {
+    setShowLanding(false);
+    return;
+  }
+
+  const saved = roleStore.get();
+  if (saved) {
+    if (saved === "employer" && !employerAuth.isAuthenticated()) {
+      roleStore.clear();
+      return;
     }
-  }, []);
+    setRole(saved);
+    setShowLanding(false);
+  }
+}, [pendingRole]);
 
   const handleRoleSelect = (r: Role) => {
     roleStore.set(r);
