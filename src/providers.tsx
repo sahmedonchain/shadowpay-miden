@@ -9,7 +9,7 @@ export function AppProviders({ children }: { children: ReactNode }) {
     <MidenFiSignerProvider
       appName={APP_NAME}
       network={WalletAdapterNetwork.Testnet}
-      autoConnect={false}
+      autoConnect={true}
     >
       <MidenProvider
         config={{ rpcUrl: MIDEN_RPC_URL, prover: MIDEN_PROVER }}
