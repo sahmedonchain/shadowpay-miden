@@ -101,7 +101,7 @@ export function LandingPage({ onEnter }: { onEnter: (role: Role) => void }) {
         <div className="relative z-10 w-full max-w-4xl mx-auto text-center space-y-4">
           <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-orange-500/10 border border-orange-500/20 text-orange-300 text-xs font-medium">
             <span className="w-1.5 h-1.5 rounded-full bg-orange-400 animate-pulse shrink-0"></span>
-            LIVE ON MIDEN TESTNET — SDK V0.14
+            LIVE ON MIDEN TESTNET
           </div>
 
           <h1 className="text-4xl sm:text-5xl md:text-7xl font-bold leading-[1.08] tracking-tight">
@@ -354,19 +354,23 @@ export function LandingPage({ onEnter }: { onEnter: (role: Role) => void }) {
 
       {/* FOOTER */}
       <footer className="border-t border-zinc-900 py-6 px-4 sm:px-6">
-        <div className="max-w-6xl mx-auto flex flex-col items-center gap-4 sm:flex-row sm:justify-between">
+        <div className="max-w-6xl mx-auto flex flex-col items-center gap-4">
+          {/* MENU - উপরে */}
+          <div className="flex flex-wrap items-center justify-center gap-5 text-xs text-zinc-600">
+            <a href="#features" className="hover:text-zinc-400 transition">Features</a>
+            <a href="#how-it-works" className="hover:text-zinc-400 transition">How it Works</a>
+            <a href="#miden" className="hover:text-zinc-400 transition">Privacy</a>
+            <a href="https://github.com/sahmedonchain/shadowpay-miden" target="_blank" rel="noreferrer" className="hover:text-zinc-400 transition">GitHub</a>
+          </div>
+          {/* DIVIDER */}
+          <div className="w-full border-t border-zinc-800/50"></div>
+          {/* LOGO - নিচে */}
           <div className="flex items-center gap-2">
             <div className="w-5 h-5 rounded-md bg-gradient-to-br from-orange-500 to-red-600 flex items-center justify-center shrink-0">
               <span className="text-white text-[10px] font-bold">S</span>
             </div>
             <span className="text-sm text-zinc-500">ShadowPay</span>
             <span className="text-zinc-700 text-xs">· © 2025 All rights reserved.</span>
-          </div>
-          <div className="flex flex-wrap items-center justify-center gap-4 text-xs text-zinc-600">
-            <a href="#features" className="hover:text-zinc-400 transition">Features</a>
-            <a href="#how-it-works" className="hover:text-zinc-400 transition">How it Works</a>
-            <a href="https://github.com/sahmedonchain/shadowpay-miden" target="_blank" rel="noreferrer" className="hover:text-zinc-400 transition">GitHub</a>
-            <a href="https://miden.xyz" target="_blank" rel="noreferrer" className="hover:text-zinc-400 transition">Miden</a>
           </div>
         </div>
       </footer>
