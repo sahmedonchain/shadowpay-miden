@@ -112,8 +112,21 @@ export function ShadowPayApp() {
   );
 
   if (isInitializing || !isReady) return (
-    <div className="flex min-h-screen items-center justify-center bg-black">
-      <div className="h-6 w-6 animate-spin rounded-full border-2 border-violet-500 border-t-transparent"></div>
+    <div className="min-h-screen bg-[#0a0a0c] flex items-center justify-center">
+      <div className="text-center space-y-4">
+        <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-orange-500 to-red-600 flex items-center justify-center mx-auto">
+          <span className="text-white font-bold">S</span>
+        </div>
+        <div>
+          <p className="text-white font-semibold text-sm">ShadowPay</p>
+          <p className="text-zinc-500 text-xs mt-1">Connecting to Miden Testnet...</p>
+        </div>
+        <div className="flex items-center justify-center gap-1">
+          <div className="w-1.5 h-1.5 rounded-full bg-orange-500 animate-bounce" style={{ animationDelay: "0ms" }}></div>
+          <div className="w-1.5 h-1.5 rounded-full bg-orange-500 animate-bounce" style={{ animationDelay: "150ms" }}></div>
+          <div className="w-1.5 h-1.5 rounded-full bg-orange-500 animate-bounce" style={{ animationDelay: "300ms" }}></div>
+        </div>
+      </div>
     </div>
   );
 
